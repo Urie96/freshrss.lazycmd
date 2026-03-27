@@ -465,7 +465,7 @@ local function list_feed_articles(feed_id, cb)
 end
 
 function M.setup(opt)
-  cfg = lc.tbl_extend(cfg, opt or {})
+  cfg = lc.tbl_extend('force', cfg, opt or {})
   cfg.login = trim(cfg.login)
   cfg.password = trim(cfg.password)
   cfg.api_endpoint = GReader.normalize_api_url(cfg.url)
