@@ -538,7 +538,7 @@ function M.list(path, cb)
     return
   end
 
-  if #path == 0 then
+  if #path == 1 then
     list_root(function(entries, err)
       if err then
         show_error(err)
@@ -551,7 +551,7 @@ function M.list(path, cb)
     return
   end
 
-  if path[1] == 'feeds' and #path == 1 then
+  if path[2] == 'feeds' and #path == 2 then
     list_feeds(function(entries, err)
       if err then
         show_error(err)
@@ -564,8 +564,8 @@ function M.list(path, cb)
     return
   end
 
-  if path[1] == 'feeds' and #path == 2 then
-    list_feed_articles(path[2], function(entries, err)
+  if path[2] == 'feeds' and #path == 3 then
+    list_feed_articles(path[3], function(entries, err)
       if err then
         show_error(err)
         cb {}
@@ -577,7 +577,7 @@ function M.list(path, cb)
     return
   end
 
-  if path[1] == 'unread' then
+  if path[2] == 'unread' then
     list_virtual_items('unread', function(entries, err)
       if err then
         show_error(err)
@@ -590,7 +590,7 @@ function M.list(path, cb)
     return
   end
 
-  if path[1] == 'saved' then
+  if path[2] == 'saved' then
     list_virtual_items('saved', function(entries, err)
       if err then
         show_error(err)
