@@ -1,4 +1,5 @@
 local M = {}
+local CACHE_NAMESPACE = 'freshrss'
 
 local runtime = {
   cfg = nil,
@@ -98,7 +99,7 @@ end
 
 local function feed_for_entry(entry)
   if not entry or entry.kind ~= 'item' then return nil end
-  local feeds = lc.cache.get(cache_key 'feeds')
+  local feeds = lc.cache.get(CACHE_NAMESPACE, cache_key 'feeds')
   return feeds and feeds.by_id and feeds.by_id[tostring(entry.item.feed_id)] or nil
 end
 

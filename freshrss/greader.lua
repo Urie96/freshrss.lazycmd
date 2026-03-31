@@ -1,4 +1,5 @@
 local M = {}
+local CACHE_NAMESPACE = 'freshrss'
 
 local function trim(s)
   if not s then return nil end
@@ -247,7 +248,7 @@ function M.create(opts)
 
   function client.fetch_feeds(cb)
     local key = cache_key 'feeds'
-    local cached = lc.cache.get(key)
+    local cached = lc.cache.get(CACHE_NAMESPACE, key)
     if cached ~= nil then
       cb(cached)
       return
@@ -303,7 +304,7 @@ function M.create(opts)
           group_title_by_feed = group_title_by_feed,
           unread_total = unread_by_id['user/-/state/com.google/reading-list'] or 0,
         }
-        lc.cache.set(key, result, { ttl = cfg.cache_ttl })
+        lc.cache.set(CACHE_NAMESPACE, key, result, { ttl = cfg.cache_ttl })
         cb(result)
       end)
     end)
@@ -311,7 +312,7 @@ function M.create(opts)
 
   function client.fetch_stream_item_count(stream_id, params, cb)
     local key = cache_key('count:' .. stream_id)
-    local cached = lc.cache.get(key)
+    local cached = lc.cache.get(CACHE_NAMESPACE, key)
     if cached ~= nil then
       cb(cached)
       return
@@ -333,7 +334,7 @@ function M.create(opts)
 
         count = count + #(data.itemRefs or {})
         if not data.continuation or page >= cfg.feed_fetch_max_pages then
-          lc.cache.set(key, count, { ttl = cfg.cache_ttl })
+          lc.cache.set(CACHE_NAMESPACE, key, count, { ttl = cfg.cache_ttl })
           cb(count)
           return
         end
@@ -346,7 +347,7 @@ function M.create(opts)
 
   function client.fetch_stream_items(cache_name, path, params, max_pages, cb)
     local key = cache_key(cache_name)
-    local cached = lc.cache.get(key)
+    local cached = lc.cache.get(CACHE_NAMESPACE, key)
     if cached ~= nil then
       cb(cached)
       return
@@ -378,7 +379,7 @@ function M.create(opts)
 
         if not data.continuation or page >= max_pages then
           all_items = sort_items_desc(all_items)
-          lc.cache.set(key, all_items, { ttl = cfg.cache_ttl })
+          lc.cache.set(CACHE_NAMESPACE, key, all_items, { ttl = cfg.cache_ttl })
           cb(all_items)
           return
         end
