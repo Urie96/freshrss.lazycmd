@@ -23,17 +23,11 @@ function M.normalize_api_url(url)
   return url .. '/api/greader.php'
 end
 
-local function urlencode(value)
-  return tostring(value):gsub('\n', '\r\n'):gsub('([^%w%-_%.~])', function(char)
-    return string.format('%%%02X', string.byte(char))
-  end)
-end
-
 local function encode_pairs(pairs)
   local chunks = {}
   for _, pair in ipairs(pairs or {}) do
     if pair[2] ~= nil then
-      table.insert(chunks, urlencode(pair[1]) .. '=' .. urlencode(pair[2]))
+      table.insert(chunks, lc.url.encode(pair[1]) .. '=' .. lc.url.encode(pair[2]))
     end
   end
   return table.concat(chunks, '&')
@@ -43,7 +37,7 @@ local function encode_query(params)
   local chunks = {}
   for key, value in pairs(params or {}) do
     if value ~= nil and value ~= '' then
-      table.insert(chunks, urlencode(key) .. '=' .. urlencode(value))
+      table.insert(chunks, lc.url.encode(key) .. '=' .. lc.url.encode(value))
     end
   end
   table.sort(chunks)
