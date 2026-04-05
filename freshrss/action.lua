@@ -157,34 +157,34 @@ local function article_preview(entry, feed)
 end
 
 local function render_current_page(entries)
-  lc.api.page_set_entries(entries)
-  local hovered = lc.api.page_get_hovered()
+  lc.api.set_entries(nil, entries)
+  local hovered = lc.api.get_hovered()
   if not hovered then return end
 
   if hovered.kind == 'item' then
     local idx = entry_index_by_id(entries, hovered.id)
-    if idx then lc.api.page_set_preview(article_preview(entries[idx], feed_for_entry(entries[idx]))) end
+    if idx then lc.api.set_preview(nil, article_preview(entries[idx], feed_for_entry(entries[idx]))) end
     return
   end
 
   if hovered.kind == 'section' then
     if hovered.key == 'unread' then
-      lc.api.page_set_preview(section_preview('Unread', '显示最近的未读文章。'))
+      lc.api.set_preview(nil, section_preview('Unread', '显示最近的未读文章。'))
       return
     end
     if hovered.key == 'saved' then
-      lc.api.page_set_preview(section_preview('Saved', '显示最近收藏的文章。'))
+      lc.api.set_preview(nil, section_preview('Saved', '显示最近收藏的文章。'))
       return
     end
     if hovered.key == 'feeds' then
-      lc.api.page_set_preview(section_preview('Feeds', '进入后按订阅源浏览最新文章。'))
+      lc.api.set_preview(nil, section_preview('Feeds', '进入后按订阅源浏览最新文章。'))
       return
     end
   end
 
   if hovered.kind == 'feed' and hovered.feed then
     local feed = hovered.feed
-    lc.api.page_set_preview(section_preview(
+    lc.api.set_preview(nil, section_preview(
       feed.title or ('Feed ' .. hovered.key),
       feed.site_url or feed.url or '',
       'Enter 查看该订阅源文章  o 打开站点'
@@ -193,7 +193,7 @@ local function render_current_page(entries)
   end
 
   if hovered.kind == 'info' then
-    lc.api.page_set_preview(M.info_preview(hovered))
+    lc.api.set_preview(nil, M.info_preview(hovered))
   end
 end
 
@@ -283,14 +283,14 @@ function M.open_entry(entry)
 end
 
 function M.copy_url(entry)
-  entry = entry or lc.api.page_get_hovered()
+  entry = entry or lc.api.get_hovered()
   if not entry or not entry.url or entry.url == '' then return end
   lc.osc52_copy(entry.url)
   lc.notify 'Article URL copied'
 end
 
 function M.set_mark(entry, mark)
-  entry = entry or lc.api.page_get_hovered()
+  entry = entry or lc.api.get_hovered()
   if not entry or entry.kind ~= 'item' then return end
 
   local previous
@@ -330,12 +330,12 @@ function M.set_mark(entry, mark)
 end
 
 function M.mark_read(entry)
-  entry = entry or lc.api.page_get_hovered()
+  entry = entry or lc.api.get_hovered()
   if entry and entry.kind == 'item' and not entry.item.is_read then M.set_mark(entry, 'read') end
 end
 
 function M.toggle_saved(entry)
-  entry = entry or lc.api.page_get_hovered()
+  entry = entry or lc.api.get_hovered()
   if not entry or entry.kind ~= 'item' then return end
   M.set_mark(entry, entry.item.is_saved and 'unsaved' or 'saved')
 end
