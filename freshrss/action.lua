@@ -88,7 +88,7 @@ end
 local function cache_key(name) return runtime.cache_key(name) end
 
 local function current_path_entries()
-  return runtime.state.page_entries[path_key(lc.api.get_current_path())]
+  return runtime.state.page_entries[path_key(deck.api.get_current_path())]
 end
 
 local function entry_index_by_id(entries, id)
@@ -99,13 +99,13 @@ end
 
 local function feed_for_entry(entry)
   if not entry or entry.kind ~= 'item' then return nil end
-  local feeds = lc.cache.get(CACHE_NAMESPACE, cache_key 'feeds')
+  local feeds = deck.cache.get(CACHE_NAMESPACE, cache_key 'feeds')
   return feeds and feeds.by_id and feeds.by_id[tostring(entry.item.feed_id)] or nil
 end
 
 local function section_preview(title, description, extra)
   local lines = {
-    lc.style.line { lc.style.span(title):fg 'yellow' },
+    deck.style.line { deck.style.span(title):fg 'yellow' },
     '',
     description,
   }
@@ -113,39 +113,39 @@ local function section_preview(title, description, extra)
     table.insert(lines, '')
     table.insert(lines, extra)
   end
-  return lc.style.text(lines)
+  return deck.style.text(lines)
 end
 
 local function article_preview(entry, feed)
   local item = entry.item
   local text = html_to_text(item.html)
   local lines = {
-    lc.style.line { lc.style.span(item.title or '(no title)'):fg 'yellow' },
-    lc.style.line {
-      lc.style.span((feed and feed.title) or ('Feed ' .. tostring(item.feed_id))):fg 'blue',
-      lc.style.span('  '):fg 'white',
-      lc.style.span(item.created_on_time and lc.time.format(item.created_on_time) or ''):fg 'darkgray',
+    deck.style.line { deck.style.span(item.title or '(no title)'):fg 'yellow' },
+    deck.style.line {
+      deck.style.span((feed and feed.title) or ('Feed ' .. tostring(item.feed_id))):fg 'blue',
+      deck.style.span('  '):fg 'white',
+      deck.style.span(item.created_on_time and deck.time.format(item.created_on_time) or ''):fg 'darkgray',
     },
   }
 
   if item.author and item.author ~= '' then
-    table.insert(lines, lc.style.line {
-      lc.style.span('Author: '):fg 'cyan',
-      lc.style.span(item.author):fg 'white',
+    table.insert(lines, deck.style.line {
+      deck.style.span('Author: '):fg 'cyan',
+      deck.style.span(item.author):fg 'white',
     })
   end
 
-  table.insert(lines, lc.style.line {
-    lc.style.span('Status: '):fg 'cyan',
-    lc.style.span(item.is_read and 'read' or 'unread'):fg(item.is_read and 'darkgray' or 'green'),
-    lc.style.span('  saved: '):fg 'cyan',
-    lc.style.span(item.is_saved and 'yes' or 'no'):fg(item.is_saved and 'yellow' or 'darkgray'),
+  table.insert(lines, deck.style.line {
+    deck.style.span('Status: '):fg 'cyan',
+    deck.style.span(item.is_read and 'read' or 'unread'):fg(item.is_read and 'darkgray' or 'green'),
+    deck.style.span('  saved: '):fg 'cyan',
+    deck.style.span(item.is_saved and 'yes' or 'no'):fg(item.is_saved and 'yellow' or 'darkgray'),
   })
 
   if item.url and item.url ~= '' then
-    table.insert(lines, lc.style.line {
-      lc.style.span('URL: '):fg 'cyan',
-      lc.style.span(item.url):fg 'magenta',
+    table.insert(lines, deck.style.line {
+      deck.style.span('URL: '):fg 'cyan',
+      deck.style.span(item.url):fg 'magenta',
     })
   end
 
@@ -153,38 +153,38 @@ local function article_preview(entry, feed)
   table.insert(lines, text ~= '' and text or '(empty content)')
   table.insert(lines, '')
   table.insert(lines, 'Enter/o 打开原文  r 标记已读  s 收藏/取消收藏  y 复制链接')
-  return lc.style.text(lines)
+  return deck.style.text(lines)
 end
 
 local function render_current_page(entries)
-  lc.api.set_entries(nil, entries)
-  local hovered = lc.api.get_hovered()
+  deck.api.set_entries(nil, entries)
+  local hovered = deck.api.get_hovered()
   if not hovered then return end
 
   if hovered.kind == 'item' then
     local idx = entry_index_by_id(entries, hovered.id)
-    if idx then lc.api.set_preview(nil, article_preview(entries[idx], feed_for_entry(entries[idx]))) end
+    if idx then deck.api.set_preview(nil, article_preview(entries[idx], feed_for_entry(entries[idx]))) end
     return
   end
 
   if hovered.kind == 'section' then
     if hovered.key == 'unread' then
-      lc.api.set_preview(nil, section_preview('Unread', '显示最近的未读文章。'))
+      deck.api.set_preview(nil, section_preview('Unread', '显示最近的未读文章。'))
       return
     end
     if hovered.key == 'saved' then
-      lc.api.set_preview(nil, section_preview('Saved', '显示最近收藏的文章。'))
+      deck.api.set_preview(nil, section_preview('Saved', '显示最近收藏的文章。'))
       return
     end
     if hovered.key == 'feeds' then
-      lc.api.set_preview(nil, section_preview('Feeds', '进入后按订阅源浏览最新文章。'))
+      deck.api.set_preview(nil, section_preview('Feeds', '进入后按订阅源浏览最新文章。'))
       return
     end
   end
 
   if hovered.kind == 'feed' and hovered.feed then
     local feed = hovered.feed
-    lc.api.set_preview(nil, section_preview(
+    deck.api.set_preview(nil, section_preview(
       feed.title or ('Feed ' .. hovered.key),
       feed.site_url or feed.url or '',
       'Enter 查看该订阅源文章  o 打开站点'
@@ -193,7 +193,7 @@ local function render_current_page(entries)
   end
 
   if hovered.kind == 'info' then
-    lc.api.set_preview(nil, M.info_preview(hovered))
+    deck.api.set_preview(nil, M.info_preview(hovered))
   end
 end
 
@@ -226,9 +226,9 @@ function M.setup(opts)
 end
 
 function M.show_error(err)
-  lc.notify(lc.style.line {
-    lc.style.span('✗ '):fg 'red',
-    lc.style.span(tostring(err)):fg 'red',
+  deck.notify(deck.style.line {
+    deck.style.span('✗ '):fg 'red',
+    deck.style.span(tostring(err)):fg 'red',
   })
 end
 
@@ -247,14 +247,14 @@ function M.item_display(item, feed_title)
   local saved_color = item.is_saved and 'yellow' or 'darkgray'
   local title = trim(item.title)
   if not title or title == '' then title = '(no title)' end
-  local date = item.created_on_time and lc.time.format(item.created_on_time, 'compact') or ''
+  local date = item.created_on_time and deck.time.format(item.created_on_time, 'compact') or ''
 
-  return lc.style.line {
-    lc.style.span(read_icon .. ' '):fg(read_color),
-    lc.style.span(saved_icon):fg(saved_color),
-    lc.style.span(title):fg(item.is_read and 'darkgray' or 'white'),
-    lc.style.span('  ' .. (feed_title or '')):fg 'blue',
-    lc.style.span('  ' .. date):fg 'darkgray',
+  return deck.style.line {
+    deck.style.span(read_icon .. ' '):fg(read_color),
+    deck.style.span(saved_icon):fg(saved_color),
+    deck.style.span(title):fg(item.is_read and 'darkgray' or 'white'),
+    deck.style.span('  ' .. (feed_title or '')):fg 'blue',
+    deck.style.span('  ' .. date):fg 'darkgray',
   }
 end
 
@@ -275,22 +275,22 @@ function M.open_entry(entry)
   if not entry then return end
 
   if entry.kind == 'item' and entry.url and entry.url ~= '' then
-    lc.system.open(entry.url)
+    deck.system.open(entry.url)
     return
   end
 
-  if entry.kind == 'feed' and entry.url and entry.url ~= '' then lc.system.open(entry.url) end
+  if entry.kind == 'feed' and entry.url and entry.url ~= '' then deck.system.open(entry.url) end
 end
 
 function M.copy_url(entry)
-  entry = entry or lc.api.get_hovered()
+  entry = entry or deck.api.get_hovered()
   if not entry or not entry.url or entry.url == '' then return end
-  lc.osc52_copy(entry.url)
-  lc.notify 'Article URL copied'
+  deck.osc52_copy(entry.url)
+  deck.notify 'Article URL copied'
 end
 
 function M.set_mark(entry, mark)
-  entry = entry or lc.api.get_hovered()
+  entry = entry or deck.api.get_hovered()
   if not entry or entry.kind ~= 'item' then return end
 
   local previous
@@ -322,20 +322,20 @@ function M.set_mark(entry, mark)
       return
     end
     M.invalidate_cache()
-    lc.notify(lc.style.line {
-      lc.style.span('✓ '):fg 'green',
-      lc.style.span('Updated article state'):fg 'green',
+    deck.notify(deck.style.line {
+      deck.style.span('✓ '):fg 'green',
+      deck.style.span('Updated article state'):fg 'green',
     })
   end)
 end
 
 function M.mark_read(entry)
-  entry = entry or lc.api.get_hovered()
+  entry = entry or deck.api.get_hovered()
   if entry and entry.kind == 'item' and not entry.item.is_read then M.set_mark(entry, 'read') end
 end
 
 function M.toggle_saved(entry)
-  entry = entry or lc.api.get_hovered()
+  entry = entry or deck.api.get_hovered()
   if not entry or entry.kind ~= 'item' then return end
   M.set_mark(entry, entry.item.is_saved and 'unsaved' or 'saved')
 end

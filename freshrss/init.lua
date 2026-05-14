@@ -21,25 +21,25 @@ local function section_entry(key, icon, icon_color, title, count)
   return {
     key = key,
     kind = 'section',
-    display = lc.style.line {
-      lc.style.span(icon .. ' '):fg(icon_color),
-      lc.style.span(title):fg 'white',
-      lc.style.span('  ' .. tostring(count or 0)):fg 'darkgray',
+    display = deck.style.line {
+      deck.style.span(icon .. ' '):fg(icon_color),
+      deck.style.span(title):fg 'white',
+      deck.style.span('  ' .. tostring(count or 0)):fg 'darkgray',
     },
   }
 end
 
 local function feed_entry(feed, group_title)
-  local updated = feed.last_updated_on_time and lc.time.format(feed.last_updated_on_time, 'compact') or ''
+  local updated = feed.last_updated_on_time and deck.time.format(feed.last_updated_on_time, 'compact') or ''
   return {
     key = tostring(feed.id),
     kind = 'feed',
     feed = feed,
     url = feed.site_url or feed.url,
-    display = lc.style.line {
-      lc.style.span(feed.title or ('Feed ' .. tostring(feed.id))):fg 'white',
-      lc.style.span(group_title and ('  [' .. group_title .. ']') or ''):fg 'blue',
-      lc.style.span(updated ~= '' and ('  ' .. updated) or ''):fg 'darkgray',
+    display = deck.style.line {
+      deck.style.span(feed.title or ('Feed ' .. tostring(feed.id))):fg 'white',
+      deck.style.span(group_title and ('  [' .. group_title .. ']') or ''):fg 'blue',
+      deck.style.span(updated ~= '' and ('  ' .. updated) or ''):fg 'darkgray',
     },
   }
 end

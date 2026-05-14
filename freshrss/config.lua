@@ -23,7 +23,7 @@ local cfg = {
 }
 
 function M.setup(opt)
-  cfg = lc.tbl_deep_extend('force', cfg, opt or {})
+  cfg = deck.tbl_deep_extend('force', cfg, opt or {})
   cfg.url = trim(cfg.url)
   cfg.login = trim(cfg.login)
   cfg.password = trim(cfg.password)

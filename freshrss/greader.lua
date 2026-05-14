@@ -27,7 +27,7 @@ local function encode_pairs(pairs)
   local chunks = {}
   for _, pair in ipairs(pairs or {}) do
     if pair[2] ~= nil then
-      table.insert(chunks, lc.url.encode(pair[1]) .. '=' .. lc.url.encode(pair[2]))
+      table.insert(chunks, deck.url.encode(pair[1]) .. '=' .. deck.url.encode(pair[2]))
     end
   end
   return table.concat(chunks, '&')
@@ -37,7 +37,7 @@ local function encode_query(params)
   local chunks = {}
   for key, value in pairs(params or {}) do
     if value ~= nil and value ~= '' then
-      table.insert(chunks, lc.url.encode(key) .. '=' .. lc.url.encode(value))
+      table.insert(chunks, deck.url.encode(key) .. '=' .. deck.url.encode(value))
     end
   end
   table.sort(chunks)
@@ -89,7 +89,7 @@ function M.create(opts)
   end
 
   local function request(req_opts, cb)
-    lc.http.request({
+    deck.http.request({
       url = req_opts.url,
       method = req_opts.method or 'GET',
       headers = req_opts.headers,
@@ -186,7 +186,7 @@ function M.create(opts)
         return
       end
 
-      local ok, data = pcall(lc.json.decode, body or '')
+      local ok, data = pcall(deck.json.decode, body or '')
       if not ok then
         cb(nil, 'invalid JSON response')
         return
@@ -242,7 +242,7 @@ function M.create(opts)
 
   function client.fetch_feeds(cb)
     local key = cache_key 'feeds'
-    local cached = lc.cache.get(CACHE_NAMESPACE, key)
+    local cached = deck.cache.get(CACHE_NAMESPACE, key)
     if cached ~= nil then
       cb(cached)
       return
@@ -298,7 +298,7 @@ function M.create(opts)
           group_title_by_feed = group_title_by_feed,
           unread_total = unread_by_id['user/-/state/com.google/reading-list'] or 0,
         }
-        lc.cache.set(CACHE_NAMESPACE, key, result, { ttl = cfg.cache_ttl })
+        deck.cache.set(CACHE_NAMESPACE, key, result, { ttl = cfg.cache_ttl })
         cb(result)
       end)
     end)
@@ -306,7 +306,7 @@ function M.create(opts)
 
   function client.fetch_stream_item_count(stream_id, params, cb)
     local key = cache_key('count:' .. stream_id)
-    local cached = lc.cache.get(CACHE_NAMESPACE, key)
+    local cached = deck.cache.get(CACHE_NAMESPACE, key)
     if cached ~= nil then
       cb(cached)
       return
@@ -328,7 +328,7 @@ function M.create(opts)
 
         count = count + #(data.itemRefs or {})
         if not data.continuation or page >= cfg.feed_fetch_max_pages then
-          lc.cache.set(CACHE_NAMESPACE, key, count, { ttl = cfg.cache_ttl })
+          deck.cache.set(CACHE_NAMESPACE, key, count, { ttl = cfg.cache_ttl })
           cb(count)
           return
         end
@@ -341,7 +341,7 @@ function M.create(opts)
 
   function client.fetch_stream_items(cache_name, path, params, max_pages, cb)
     local key = cache_key(cache_name)
-    local cached = lc.cache.get(CACHE_NAMESPACE, key)
+    local cached = deck.cache.get(CACHE_NAMESPACE, key)
     if cached ~= nil then
       cb(cached)
       return
@@ -373,7 +373,7 @@ function M.create(opts)
 
         if not data.continuation or page >= max_pages then
           all_items = sort_items_desc(all_items)
-          lc.cache.set(CACHE_NAMESPACE, key, all_items, { ttl = cfg.cache_ttl })
+          deck.cache.set(CACHE_NAMESPACE, key, all_items, { ttl = cfg.cache_ttl })
           cb(all_items)
           return
         end

@@ -1,8 +1,8 @@
-# freshrss.lazycmd
+# freshrss.lazydeck
 
 基于 FreshRSS Google Reader API 的 RSS 阅读插件。
 
-目录结构已按 `examples/demo.lazycmd/demo` 的方式重构：
+目录结构已按 `examples/demo.lazydeck/demo` 的方式重构：
 
 - `freshrss/init.lua` 负责路由和列表数据加载
 - `freshrss/config.lua` 负责配置归一化
@@ -22,11 +22,11 @@
 
 ## 配置
 
-在 `examples/init.lua` 或 `~/.config/lazycmd/init.lua` 中配置：
+在 `examples/init.lua` 或 `~/.config/lazydeck/init.lua` 中配置：
 
 ```lua
 {
-  dir = 'plugins/freshrss.lazycmd',
+  dir = 'plugins/freshrss.lazydeck',
   config = function()
     require('freshrss').setup {
       url = os.getenv 'FRESHRSS_URL',
